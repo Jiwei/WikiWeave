@@ -8,8 +8,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from knowledge_extractor.util.ontology import CodeModuleRecord, CodeUnitRecord, DocSectionRecord, SourceRecord
-from knowledge_extractor.util.paths import ROOT
+from util.ontology import CodeModuleRecord, CodeUnitRecord, DocSectionRecord, SourceRecord
+from util.paths import ROOT
 
 
 # Generic function/file names that do NOT reliably indicate "this code is mentioned".
@@ -71,7 +71,7 @@ def scan_codebase(sources: list[SourceRecord]) -> tuple[list[CodeUnitRecord], li
     承载文件级元数据/import),由 module 级 unit 提炼;CodeUnit 仍是单元级(含 kind=module 的
     模块级单元)——二者有重叠但用途不同(见 model_data/code/entities.json)。
     """
-    from knowledge_extractor.segmentation.code import treesitter_scan as ts
+    from segmentation.code import treesitter_scan as ts
 
     units: list[CodeUnitRecord] = []
     modules: list[CodeModuleRecord] = []

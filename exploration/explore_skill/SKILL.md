@@ -7,7 +7,7 @@ description: Exploration (EDA) — scan the input corpus, discover the model_dat
 
 > **What**: The extraction pipeline needs a defined `model_data/` before it can run. This skill
 > discovers the **four dimensions** of `model_data/` from the input corpus and writes them back.
-> **Invoked by**: `python -m knowledge_extractor.run --explore` (via a Claude Code agent), or manually.
+> **Invoked by**: `python run.py --explore` (via a Claude Code agent), or manually.
 > **State**: `model_data/` — persisted; the pipeline's gate skips exploration when it's already complete.
 
 > **Two layers (merged at load time)**:
@@ -141,11 +141,11 @@ code: re-theming a corpus = edit the `render` JSON, not the renderer.
 
 ## Procedure
 
-1. **Inventory the corpus** — reuse `knowledge_extractor.exploration.inventory` (don't hand-scan): run `detect_content_types()` to learn whether the corpus has code/non-code, and `build_source_inventory()` to list sources with their `source_type` (via `infer_source_type`). These results drive `sources/source_types.json` and decide which dimensions to discover (code vs non-code vs both).
+1. **Inventory the corpus** — reuse `exploration.inventory` (don't hand-scan): run `detect_content_types()` to learn whether the corpus has code/non-code, and `build_source_inventory()` to list sources with their `source_type` (via `infer_source_type`). These results drive `sources/source_types.json` and decide which dimensions to discover (code vs non-code vs both).
 2. **Discover domains** — from section content derive a small multi-label taxonomy: `valid_domains.json` (names + `others`), rich `definitions.json` (per domain: `label`, `concept`, `typical_activities`, `not`, `discriminating_signals`), `keywords.json` (domain → keywords), and `sub_domains.json` (domain → `[zh, en, [keywords]]`).
 3. **Discover code objects + code_domain** (if code) — define `CodeModule`/`CodeUnit` fields in `code/entities.json`, a `code_domain.json` list (`name`, `domain` ∈ valid_domains, optional `sub_domain`, `keywords`, `description`) plus `unclassified_label`, and a `naming_keys.json` glossary of team abbreviations.
 4. **Discover entities** (if non-code) — define the entity schema in `ontology/entities.json` beyond `DocSectionRecord`, plus actor/asset vocabularies (asset classes + keywords, alias map, honorifics, non-person stoplist).
-5. **Write back** `model_data/` in the schemas below; then verify with `python -m knowledge_extractor.run --skip-check --phase 1`.
+5. **Write back** `model_data/` in the schemas below; then verify with `python run.py --skip-check --phase 1`.
 
 ## JSON schemas
 

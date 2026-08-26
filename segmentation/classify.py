@@ -4,8 +4,8 @@ from __future__ import annotations
 import json
 import re
 
-from knowledge_extractor.util import model_data
-from knowledge_extractor.util.llm import LlmConfig
+from util import model_data
+from util.llm import LlmConfig
 
 # ── 关键词表:单一事实源是 model_data/domains/keywords.json ──
 DOMAIN_KEYWORDS: dict[str, list[str]] = model_data.domain_keywords()
@@ -76,7 +76,7 @@ def _load_domain_definitions() -> dict[str, str]:
 
 def classify_batch_with_llm(content_type: str, items: list, batch_size: int = 20) -> None:
     """Batch-classify: for each item sets .domains, .people in-place."""
-    from knowledge_extractor.util.llm import _call_llm
+    from util.llm import _call_llm
 
     cfg = LlmConfig.from_env()
     if not cfg.available:
@@ -120,7 +120,7 @@ def classify_batch_with_llm(content_type: str, items: list, batch_size: int = 20
                 results_list.append((idx, classify_keywords(text), []))
         return bi, results_list
 
-    from knowledge_extractor.util.paths import get_llm_settings
+    from util.paths import get_llm_settings
     settings = get_llm_settings("phase1")
 
     with ThreadPoolExecutor(max_workers=settings["max_workers"]) as ex:

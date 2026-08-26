@@ -15,7 +15,7 @@ from pathlib import Path
 
 import numpy as np
 
-from knowledge_extractor.util.paths import KB_DIR
+from util.paths import KB_DIR
 
 # ── Embedding model (lazy load, shared) ──
 

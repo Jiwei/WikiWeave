@@ -12,11 +12,11 @@ from __future__ import annotations
 
 import re
 
-from knowledge_extractor.util import model_data
-from knowledge_extractor.util.ontology import get as get_entity, to_dict
-from knowledge_extractor.util.i18n import prompt_language
-from knowledge_extractor.extraction.meta import register
-from knowledge_extractor.extraction.meta_ops.seed import _add, ARTIFACT_KINDS
+from util import model_data
+from util.ontology import get as get_entity, to_dict
+from util.i18n import prompt_language
+from extraction.meta import register
+from extraction.meta_ops.seed import _add, ARTIFACT_KINDS
 
 _GENERIC_NAMES = set(model_data.seed_patterns().get("artifact", {}).get("generic_deliverable_names", []))
 
@@ -27,7 +27,7 @@ def _derive_curated_titles(curated: list) -> None:
     Falls back to the codename if the LLM is unavailable or the parse fails.
     `name` (codename) stays the stable identity; the LLM only fills `title`.
     """
-    from knowledge_extractor.util.llm import chat, available
+    from util.llm import chat, available
 
     if not available():
         return
@@ -83,7 +83,7 @@ def _llm_backfill_artifacts(
     records: dict, tasks: list[dict], protocols: list[dict], sections_by_id: dict[str, dict],
 ) -> None:
     """LLM scan of task titles + protocol names for missed named deliverables."""
-    from knowledge_extractor.util.llm import chat, available
+    from util.llm import chat, available
     import json as _json
 
     if not available():
@@ -146,7 +146,7 @@ def _llm_backfill_artifacts(
 
 def _synthesize_details(records: list, doc_sections: list) -> None:
     """LLM-synthesize rich detail fields for each artifact from its source sections."""
-    from knowledge_extractor.util.llm import chat, available
+    from util.llm import chat, available
     import json as _json
 
     if not available():

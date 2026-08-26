@@ -6,8 +6,7 @@ import os
 import py_compile
 import importlib
 
-ROOT = os.path.dirname(os.path.abspath(__file__))          # knowledge_extractor/
-PKG_PARENT = os.path.dirname(ROOT)
+ROOT = os.path.dirname(os.path.abspath(__file__))          # 项目根目录
 os.environ.setdefault("KE_INPUT_PATH", ROOT)
 
 SKIP = {"_health", "_smoke_base"}
@@ -24,7 +23,7 @@ pyfiles.sort()
 lines = [f"TOTAL_PY={len(pyfiles)}", "", "== COMPILE =="]
 compile_fail = 0
 for p in pyfiles:
-    rel = os.path.relpath(p, PKG_PARENT)
+    rel = os.path.relpath(p, ROOT)
     try:
         py_compile.compile(p, doraise=True)
     except Exception as e:
@@ -35,7 +34,7 @@ lines.append(f"compile_fail={compile_fail}")
 lines += ["", "== IMPORT =="]
 import_fail = 0
 for p in pyfiles:
-    rel = os.path.relpath(p, PKG_PARENT)
+    rel = os.path.relpath(p, ROOT)
     stem = os.path.basename(p)[:-3]
     if stem in SKIP:
         continue

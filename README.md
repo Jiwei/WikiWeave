@@ -78,17 +78,17 @@ means editing JSON, not Python.
 # 1. (optional) install per-source-type dependencies
 pip install pymupdf pymupdf4llm python-docx tree-sitter-language-pack
 
-# 2. point it at a corpus and run
-python -m knowledge_extractor.run /path/to/your/corpus --phase all
+# 2. point it at a corpus and run (runs both phases end-to-end by default)
+python run.py /path/to/your/corpus
 
 #   or via env var / config (see Configuration)
-KE_INPUT_PATH=/path/to/corpus python -m knowledge_extractor.run --phase 1
+KE_INPUT_PATH=/path/to/corpus python run.py
 ```
 
-Phases: `--phase all` (default) | `1` | `2` | `check`.
-
 The orchestrator first checks that `model_data/` is defined; if not, it points you to
-[exploration](#exploration--the-agent). Then it segments, extracts, links, and renders:
+[exploration](#exploration--the-agent). Then it runs both phases end-to-end —
+Phase 1 (inventory → segment → code-scan → domain-classify → write knowledge bits → render),
+then Phase 2 (structured entity extraction → meta enrichment → re-render):
 
 ```
 artifact/
@@ -102,6 +102,16 @@ artifact/
 ├── index/                   # self-contained OKF Markdown wiki (human/agent-readable)
 └── index_html/              # navigable HTML wiki
 ```
+
+> **Running part of the pipeline** (`--phase`, advanced): you normally don't need this — the
+> default already runs everything. Pass `--phase` only to run a single segment in isolation:
+>
+> | Value | Runs |
+> |---|---|
+> | `all` | Phase 1 → Phase 2 → check (the default) |
+> | `1` | Phase 1 only: inventory → segment → code-scan → domain-classify → write knowledge bits → render |
+> | `2` | Phase 2 only: structured entity extraction → meta enrichment → re-render |
+> | `check` | quality-check gate only (`validation/quality_check`) |
 
 ---
 
@@ -256,9 +266,9 @@ you to exploration.
 
 Exploration is **automated via a Claude Code agent** (currently the only supported harness):
 
-- `python -m knowledge_extractor.run --explore` — invokes `claude -p` (headless, `--dangerously-skip-permissions`
+- `python run.py --explore` — invokes `claude -p` (headless, `--dangerously-skip-permissions`
   for non-interactive write-back) with the [`explore_skill`](exploration/explore_skill/SKILL.md).
-- `python -m knowledge_extractor.run` — skips exploration automatically when `model_data/` is already complete.
+- `python run.py` — skips exploration automatically when `model_data/` is already complete.
 
 The skill discovers sources, domains, code objects + `code_domain`, and entities — reusing
 `exploration/inventory.py` for the corpus scan — then writes the results back to `model_data/`.
@@ -272,7 +282,7 @@ Afterward the gate re-checks and the pipeline proceeds.
 ## Project structure
 
 ```
-knowledge_extractor/
+auto_archivist/
 ├── run.py                 # top-level orchestrator (exploration → … → check)
 ├── exploration/           # 1. source discovery, dedup, routing
 │   └── explore_skill/     #    the agentic EDA → model_data skill (SKILL.md)
@@ -294,20 +304,6 @@ knowledge_extractor/
 │   ├── code/  domains/  ontology/  sources/   # same layout; filled by exploration
 └── config/                # settings.json + llm.json
 ```
-
----
-
-## Testing
-
-```bash
-python -m pytest            # from the repo root (knowledge_builder/)
-# or, without pytest installed:
-python tests/test_ontology.py
-python tests/test_inventory.py
-```
-
-Tests cover: entity-schema generation, keyword/domain data integrity, source-type routing, and
-recursive inventory + deferred-file collection.
 
 ---
 

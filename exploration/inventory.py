@@ -11,9 +11,9 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-from knowledge_extractor.util import model_data
-from knowledge_extractor.util.ontology import SourceRecord
-from knowledge_extractor.util.paths import input_path
+from util import model_data
+from util.ontology import SourceRecord
+from util.paths import input_path
 
 IGNORED_NAMES = {".DS_Store"}
 IGNORED_PREFIXES = (".~",)

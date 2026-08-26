@@ -26,7 +26,7 @@ import re
 from collections import defaultdict
 from pathlib import Path
 
-from knowledge_extractor.util.paths import index_dir, kb_dir
+from util.paths import index_dir, kb_dir
 
 INDEX_DIR = index_dir()
 KB_DIR = kb_dir()
@@ -55,7 +55,7 @@ def _derive_term_aliases(canonical: list[str]) -> dict[str, list[str]]:
     """LLM-derive aliases for canonical terms; returns {canonical: [aliases]}."""
     # TODO(搬移): 新 util.llm 接口为 chat/extract_json/available,不再提供 LlmConfig/_call_llm;
     # 调用点算法逻辑按要求保留未改,后续需按新接口适配
-    from knowledge_extractor.util.llm import LlmConfig, _call_llm
+    from util.llm import LlmConfig, _call_llm
     import re as _re
 
     cfg = LlmConfig.from_env()

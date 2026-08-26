@@ -10,14 +10,14 @@ import re
 from collections import Counter
 from pathlib import Path
 
-from knowledge_extractor.extraction.normalize import (
+from extraction.normalize import (
     _has_surname, _is_valid_name, _strip_honorific,
     build_name_pool_from_sections, normalize_person_field,
 )
-from knowledge_extractor.extraction.alias_map import load_alias_map
-from knowledge_extractor.util import model_data
-from knowledge_extractor.util.ontology import get as get_entity, to_dict
-from knowledge_extractor.extraction.meta import register
+from extraction.alias_map import load_alias_map
+from util import model_data
+from util.ontology import get as get_entity, to_dict
+from extraction.meta import register
 
 _PERSON = model_data.seed_patterns().get("person", {})
 _MSG_RE = re.compile(_PERSON["chat_message_pattern"]) if _PERSON.get("chat_message_pattern") else None

@@ -28,9 +28,9 @@ from collections import Counter
 from pathlib import Path
 from urllib.parse import unquote
 
-from knowledge_extractor.util.paths import index_dir, kb_dir, output_dir
+from util.paths import index_dir, kb_dir, output_dir
 # TODO(搬移): icloud_cleanup 未在本次搬移范围内,ICLOUD_CONFLICT_RE 常量目标位置待定(疑似 util)
-from knowledge_extractor.util.icloud_cleanup import ICLOUD_CONFLICT_RE
+from util.icloud_cleanup import ICLOUD_CONFLICT_RE
 
 INDEX_DIR = index_dir()
 KB_DIR = kb_dir()
@@ -1235,7 +1235,7 @@ def check_project_artifact_families() -> int:
 def main() -> int:
     """Run all quality checks. Returns exit code (0 = all pass)."""
     if not INDEX_DIR.exists() or not HTML_DIR.exists():
-        print("ERROR: Phase 1 output not found. Run 'python -m knowledge_extractor.run --phase 1' first.")
+        print("ERROR: Phase 1 output not found. Run 'python run.py --phase 1' first.")
         return 1
 
     errors = 0

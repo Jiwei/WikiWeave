@@ -5,12 +5,12 @@ from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
-from knowledge_extractor.util import model_data
-from knowledge_extractor.util.i18n import t
-from knowledge_extractor.util.ontology import (
+from util import model_data
+from util.i18n import t
+from util.ontology import (
     CodeUnitRecord, DocSectionRecord, DomainRecord, SourceRecord, get as get_entity,
 )
-from knowledge_extractor.util.paths import index_dir, kb_dir, portable_code_path
+from util.paths import index_dir, kb_dir, portable_code_path
 
 INDEX_DIR = index_dir()
 KB_DIR = kb_dir()
@@ -162,7 +162,7 @@ def _render_domain_f1(dname: str, dlabel: str) -> str:
     if by_type:
         links = []
         # entity type → page dir(由 entities.json 的 render 驱动;document 为特殊锚点)
-        from knowledge_extractor.util.ontology import all_entities
+        from util.ontology import all_entities
         type_map = {}
         for _n, _c in all_entities().items():
             _r = getattr(_c, "_render", {})
@@ -600,7 +600,7 @@ def render_index(
     kind_stats = "\n".join(f"  {k}: {c}" for k, c in kc.most_common())
 
     # what_looking_for 实体行(由 entities.json 的 nav_hint + render 驱动)
-    from knowledge_extractor.util.ontology import all_entities as _all_entities
+    from util.ontology import all_entities as _all_entities
     _what_lines = []
     for _n, _c in _all_entities().items():
         _r = getattr(_c, "_render", {})
@@ -768,7 +768,7 @@ Browsable code structure pages generated from AST analysis — imports, function
     # duplicates already covered by the dedup table in code/index.md).
     from collections import defaultdict as _defaultdict
     # TODO(搬移): code_map 未在本次搬移范围内,目标位置待定(疑似 exploration/segmentation.code)
-    from knowledge_extractor.segmentation.code.code_map import _classify_code_domain
+    from segmentation.code.code_map import _classify_code_domain
     sections_by_id = {ds.id: ds for ds in doc_sections}
     canonical_units = [cu for cu in code_units
                        if source_by_id.get(cu.source_id)
@@ -832,7 +832,7 @@ Browsable code structure pages generated from AST analysis — imports, function
             person_section_map[pname].append(ds)
 
     # 反向引用:凡 ref=PersonRecord 的字段,建立 person → 实体 映射(由 entities.json 声明驱动)
-    from knowledge_extractor.util.ontology import all_entities as _all_entities
+    from util.ontology import all_entities as _all_entities
     _schema = model_data.load("ontology/entities")
     person_entity_map: dict[str, list] = defaultdict(list)  # person -> [(label, page_dir, slug_field, title_field, rec)]
     for _name, _cls in _all_entities().items():
@@ -966,7 +966,7 @@ Browsable code structure pages generated from AST analysis — imports, function
         print(f"  cleaned {stale} stale section pages", flush=True)
 
     # ── 通用实体页渲染(由 entities.json 的 render 声明驱动) ──
-    from knowledge_extractor.util.ontology import all_entities
+    from util.ontology import all_entities
     entity_records = {}
     for _name, _cls in all_entities().items():
         _lk = getattr(_cls, "_list_key", "")
@@ -987,7 +987,7 @@ Browsable code structure pages generated from AST analysis — imports, function
     _link_phase2_pages(sources, doc_sections)
 
     # ── Self-indexing: TERMS.md + Search Tags + backlinks + frontmatter aliases ──
-    from knowledge_extractor.render.selfindex import render_terms, render_selfindex
+    from render.selfindex import render_terms, render_selfindex
     render_terms()
     render_selfindex()
 
@@ -1000,11 +1000,11 @@ Browsable code structure pages generated from AST analysis — imports, function
 
     # ── Code structure index(仅当语料含代码时渲染;纯文档语料跳过) ──
     if code_units:
-        from knowledge_extractor.render.code_index import render_code_index
+        from render.code_index import render_code_index
         render_code_index()
         # The code map renders the index page from code_map.json, replacing the
         # directory-mirror grouping. Leaf pages stay from render_code_index.
-        from knowledge_extractor.segmentation.code.code_map import render_code_map
+        from segmentation.code.code_map import render_code_map
         render_code_map()
 
 
@@ -1027,8 +1027,8 @@ def _write_agents_md(
     实体清单、字段表、目录树、导航列表都由 all_entities() 的 render/doc/fields 驱动;
     仅保留与实体无关的通用约定(领域分类、来源类型、链接约定、阅读约定)作为静态文案。
     """
-    from knowledge_extractor.util.ontology import all_entities
-    from knowledge_extractor.util import model_data as _md
+    from util.ontology import all_entities
+    from util import model_data as _md
 
     # ── 收集实体信息(单一事实源:entities.json 的 schema + render) ──
     schema = _md.load("ontology/entities")
@@ -1498,7 +1498,7 @@ def _link_phase2_pages(sources, doc_sections) -> None:
     (原「main index 加 Phase 2 段」是死代码:主索引的 entity_indexes 段已含这些链接,guard 恒 false,已移除。)
     """
     import re as _re
-    from knowledge_extractor.util.ontology import all_entities
+    from util.ontology import all_entities
 
     sections_by_id = {ds.id: ds for ds in doc_sections}
 
@@ -1588,7 +1588,7 @@ def _link_phase2_pages(sources, doc_sections) -> None:
 if __name__ == "__main__":
     # Full render from scratch — reads everything in knowledge_bits
     import json as _json
-    from knowledge_extractor.util.ontology import build_domains
+    from util.ontology import build_domains
 
     sources = [SourceRecord(**s) for s in _json.loads((KB_DIR / "sources.json").read_text())]
     doc_sections = [DocSectionRecord(**ds) for ds in _json.loads((KB_DIR / "doc_sections.json").read_text())]

@@ -8,8 +8,8 @@ from __future__ import annotations
 import hashlib
 import re
 
-from knowledge_extractor.util.ontology import DocSectionRecord, SourceRecord, get_optional
-from knowledge_extractor.util.paths import ROOT
+from util.ontology import DocSectionRecord, SourceRecord, get_optional
+from util.paths import ROOT
 
 PATH_RE = re.compile(r"(/[-A-Za-z0-9_./~]{4,})")
 FILE_REF_RE = re.compile(r"([A-Za-z0-9_./-]+\.(?:py|md|csv|parquet|zst|json|pdf|docx))")
@@ -24,7 +24,7 @@ def _read_section_text(source: SourceRecord, section: DocSectionRecord, cache: d
     key = source.path
     if key not in cache:
         try:
-            from knowledge_extractor.segmentation.doc.sections import _read_text
+            from segmentation.doc.sections import _read_text
             cache[key] = _read_text(ROOT / source.path)
         except Exception:
             cache[key] = ""

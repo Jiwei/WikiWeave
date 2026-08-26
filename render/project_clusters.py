@@ -37,8 +37,8 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
-from knowledge_extractor.util.paths import kb_dir, root
-from knowledge_extractor.util import model_data
+from util.paths import kb_dir, root
+from util import model_data
 
 KB_DIR = kb_dir()
 # TODO(搬移): 新 paths 未在改写规则中列出 root();若无此函数需按实际接口调整
@@ -405,7 +405,7 @@ Return JSON: {{"label": "...", "description": "..."}}"""
 def _llm_label(clusters: list[dict]) -> None:
     """Optional: enrich labels via one LLM call per cluster. Falls back silently."""
     # TODO(搬移): 新 util.llm 接口为 chat/extract_json/available,不再提供 LlmConfig/_call_llm;算法逻辑保留未改,后续按新接口适配
-    from knowledge_extractor.util.llm import LlmConfig, _call_llm
+    from util.llm import LlmConfig, _call_llm
 
     cfg = LlmConfig.from_env()
     if not cfg.available:

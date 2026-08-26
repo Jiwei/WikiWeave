@@ -13,12 +13,12 @@ import re
 from collections import Counter
 from pathlib import Path
 
-from knowledge_extractor.util import model_data
-from knowledge_extractor.util.ontology import DocSectionRecord, SourceRecord
-from knowledge_extractor.util.ontology import get as get_entity, to_dict
-from knowledge_extractor.util.paths import ROOT
-from knowledge_extractor.extraction.pipeline import sha_id
-from knowledge_extractor.extraction.meta import register
+from util import model_data
+from util.ontology import DocSectionRecord, SourceRecord
+from util.ontology import get as get_entity, to_dict
+from util.paths import ROOT
+from extraction.pipeline import sha_id
+from extraction.meta import register
 
 # ── 模式数据(单一事实源:model_data/ontology/seed_patterns.json) ──
 _P = model_data.seed_patterns()
@@ -378,7 +378,7 @@ def seed_projects(cls, params, context, entities):
 @register("seed", "resource")
 def seed_resources(cls, params, context, entities):
     """确定性 seed:扫描 section 文本 → 资源引用(ResourceRecord)。"""
-    from knowledge_extractor.extraction.literals import extract_resources
+    from extraction.literals import extract_resources
     return [to_dict(r) for r in extract_resources(context["sources"], context["doc_sections"])]
 
 

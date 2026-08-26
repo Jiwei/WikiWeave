@@ -24,9 +24,9 @@ import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from knowledge_extractor.util import model_data
-from knowledge_extractor.util.i18n import prompt_language
-from knowledge_extractor.util.paths import kb_dir
+from util import model_data
+from util.i18n import prompt_language
+from util.paths import kb_dir
 
 KB_DIR = kb_dir()
 
@@ -78,7 +78,7 @@ def _llm_hooks(bundles: list[dict], sections_by_id: dict[str, dict]) -> None:
     carry entry section ids for provenance.
     """
     # TODO(搬移): 新 util.llm 接口为 chat/extract_json/available,不再提供 LlmConfig/_call_llm;算法逻辑保留未改,后续按新接口适配
-    from knowledge_extractor.util.llm import LlmConfig, _call_llm
+    from util.llm import LlmConfig, _call_llm
     import json as _json
     import re as _re
 
@@ -275,7 +275,7 @@ def build_hub_data(
                     best_b.setdefault("entities", []).append(f"{etype}:{label_fn(r)}")
 
     # ── fold 薄实体(由 entities.json 的 render.hub_role=fold 声明驱动;seed 体见上方实体专属 hook) ──
-    from knowledge_extractor.util.ontology import all_entities
+    from util.ontology import all_entities
     for _name, _cls in all_entities().items():
         _rcfg = getattr(_cls, "_render", {})
         if _rcfg.get("hub_role") != "fold":

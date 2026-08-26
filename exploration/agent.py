@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import subprocess
 
-from knowledge_extractor.util.paths import PKG_ROOT, input_path
+from util.paths import PKG_ROOT, input_path
 
 
 def skill_path() -> str:
@@ -24,9 +24,9 @@ def build_prompt() -> str:
         "code/entities.json + code_domain.json + naming_keys.json(若语料含代码)、"
         "ontology/entities.json + 人物/资产词汇(若语料含非代码)。"
         "必须满足 model_data 完整性契约(见技能)。"
-        "清点语料请复用 knowledge_extractor.exploration.inventory"
+        "清点语料请复用 exploration.inventory"
         "(detect_content_types / build_source_inventory / infer_source_type),勿手写扫描逻辑。"
-        "写回后运行 `python -m knowledge_extractor.run --skip-check --phase 1` 验证门禁通过。"
+        "写回后运行 `python run.py --skip-check --phase 1` 验证门禁通过。"
     )
 
 

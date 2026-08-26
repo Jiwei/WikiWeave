@@ -12,8 +12,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from knowledge_extractor.util.ontology import CodeUnitRecord, SourceRecord
-from knowledge_extractor.util.paths import ROOT
+from util.ontology import CodeUnitRecord, SourceRecord
+from util.paths import ROOT
 
 # ── 扩展名 → 语言 ──
 EXT_LANG: dict[str, str] = {

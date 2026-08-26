@@ -2,7 +2,7 @@
 
 这是"models.py 数据化外置"的运行时支撑。过程代码照旧写::
 
-    from knowledge_extractor.util.ontology import DocSectionRecord, to_dict
+    from util.ontology import DocSectionRecord, to_dict
 
 生成的类与原 indexing/models.py / phase2/models.py 的 dataclass 字段完全对齐,
 因此现有函数逻辑无需改动。字段定义唯一事实源是 entities.json。

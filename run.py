@@ -11,8 +11,8 @@
   - check(validation.quality_check.main):质量校验门禁
 
 用法:
-    python -m knowledge_extractor.run [输入目录] [--phase all|1|2|check] [--skip-check]
-    KE_INPUT_PATH=/path/to/corpus python -m knowledge_extractor.run --phase 1
+    python run.py [输入目录] [--phase all|1|2|check] [--skip-check]
+    KE_INPUT_PATH=/path/to/corpus python run.py --phase 1
 
 输入目录优先级:CLI 位置参数 > 环境变量 KE_INPUT_PATH > config/settings.json 的 input_path。
 """
@@ -23,15 +23,15 @@ import os
 import sys
 from pathlib import Path
 
-from knowledge_extractor.util import model_data
-from knowledge_extractor.util.ontology import build_domains, to_dict
-from knowledge_extractor.util.paths import INDEX_DIR, KB_DIR, OUT_DIR, input_path
-from knowledge_extractor.extraction.pipeline import stage, tick, write_json
+from util import model_data
+from util.ontology import build_domains, to_dict
+from util.paths import INDEX_DIR, KB_DIR, OUT_DIR, input_path
+from extraction.pipeline import stage, tick, write_json
 
 
 def _check_model_data_ready() -> list[str]:
     """探测内容类型并返回缺失的 model_data 键(空列表=已就绪,可跳过 exploration)。"""
-    from knowledge_extractor.exploration.inventory import detect_content_types
+    from exploration.inventory import detect_content_types
     has_code, has_non_code = detect_content_types()
     return model_data.missing_model_data(has_code, has_non_code)
 
@@ -39,11 +39,11 @@ def _check_model_data_ready() -> list[str]:
 # ── Phase 1:领域分类(LLM 主 / 关键词兜底) ──
 
 def _classify_doc_sections(doc_sections, source_by_id, llm_available: bool) -> None:
-    from knowledge_extractor.segmentation.classify import (
+    from segmentation.classify import (
         classify_batch_with_llm,
         classify_keywords,
     )
-    from knowledge_extractor.util.llm import phase_settings
+    from util.llm import phase_settings
 
     p1 = phase_settings("classify")
     if llm_available and doc_sections:
@@ -62,7 +62,7 @@ def _classify_doc_sections(doc_sections, source_by_id, llm_available: bool) -> N
 
 
 def _classify_code_units(code_units, source_by_id) -> None:
-    from knowledge_extractor.segmentation.classify import classify_keywords
+    from segmentation.classify import classify_keywords
     for cu in code_units:
         src = source_by_id.get(cu.source_id)
         cu.domains = classify_keywords(f"{cu.name} {cu.kind} {src.path if src else ''}")
@@ -70,15 +70,15 @@ def _classify_code_units(code_units, source_by_id) -> None:
 
 def _run_phase1() -> None:
     """Phase 1:源清点 → 分段 → 抽取 → 代码扫描 → 领域分类 → 建域索引 → 渲染。"""
-    from knowledge_extractor.exploration.inventory import (
+    from exploration.inventory import (
         build_source_inventory,
         collect_deferred_files,
     )
-    from knowledge_extractor.segmentation.doc.sections import build_section_inventory
-    from knowledge_extractor.segmentation.code.scan import link_code_to_docs, scan_codebase
-    from knowledge_extractor.util.llm import available
-    from knowledge_extractor.render.okf_markdown import render_index
-    from knowledge_extractor.render.html import convert_index_to_html
+    from segmentation.doc.sections import build_section_inventory
+    from segmentation.code.scan import link_code_to_docs, scan_codebase
+    from util.llm import available
+    from render.okf_markdown import render_index
+    from render.html import convert_index_to_html
 
     domains = build_domains()
 
@@ -106,7 +106,7 @@ def _run_phase1() -> None:
     link_code_to_docs(doc_sections, code_units, source_by_id)
 
     # 代码域(code_domain)分类:关联到 domains 的文件级分类
-    from knowledge_extractor.segmentation.code.code_map import classify_code_modules
+    from segmentation.code.code_map import classify_code_modules
     classify_code_modules(code_modules, code_units)
     tick(f"{len(code_modules)} code modules classified into code domains")
 
@@ -119,7 +119,7 @@ def _run_phase1() -> None:
                      "dependency_graph": {"edges": [], "stats": {}},
                      "cfg": [], "cfg_stats": {}}
     try:
-        from knowledge_extractor.segmentation.code.analysis import run_analysis
+        from segmentation.code.analysis import run_analysis
         code_analysis = run_analysis(sources, code_units, base)
         cg, dg = code_analysis["call_graph"]["stats"], code_analysis["dependency_graph"]["stats"]
         tick(f"调用图 {cg.get('edges', 0)} 边(内部 {cg.get('internal', 0)}), "
@@ -151,7 +151,7 @@ def _run_phase1() -> None:
 
     stage("8. 工程聚类(代码堆)")
     try:
-        from knowledge_extractor.render.project_clusters import write_project_clusters
+        from render.project_clusters import write_project_clusters
         pc = write_project_clusters()
         st = pc.get("stats", {})
         tick(f"{st.get('clusters', 0)} clusters, "
@@ -162,7 +162,7 @@ def _run_phase1() -> None:
     stage("9. 渲染索引")
     render_index(domains, sources, doc_sections, code_units)
     try:
-        from knowledge_extractor.render.code_analysis_page import render_code_analysis
+        from render.code_analysis_page import render_code_analysis
         if render_code_analysis(code_analysis, code_units, sources):
             tick("code analysis page rendered")
     except Exception as e:
@@ -206,7 +206,7 @@ def main(argv: list[str] | None = None) -> int:
 
     # ── --explore: 调用 Claude Code 智能体执行 exploration(EDA → 写回 model_data) ──
     if args.explore:
-        from knowledge_extractor.exploration.agent import invoke_exploration
+        from exploration.agent import invoke_exploration
         rc = invoke_exploration()
         if rc != 0:
             return rc
@@ -218,7 +218,7 @@ def main(argv: list[str] | None = None) -> int:
             print("✋ model_data 不完整,需先执行 exploration 定义以下文件:", flush=True)
             for m in missing:
                 print(f"  · {m}", flush=True)
-            print("\n请运行 `python -m knowledge_extractor.run --explore` 调用 Claude Code 智能体执行 exploration,"
+            print("\n请运行 `python run.py --explore` 调用 Claude Code 智能体执行 exploration,"
                   "或手动完善 model_data/ 后重跑。\n"
                   "(如需强制跳过门禁,加 --skip-check)", flush=True)
             return 1
@@ -227,11 +227,11 @@ def main(argv: list[str] | None = None) -> int:
         _run_phase1()
 
     if args.phase in ("all", "2"):
-        from knowledge_extractor.extraction.run import main as phase2_main
+        from extraction.run import main as phase2_main
         phase2_main()
 
     if args.phase in ("all", "check"):
-        from knowledge_extractor.validation.quality_check import main as check_main
+        from validation.quality_check import main as check_main
         rc = check_main()
         return int(rc or 0)
 

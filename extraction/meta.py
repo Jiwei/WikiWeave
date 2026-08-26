@@ -12,8 +12,8 @@ entities.json 里每个实体用 "meta": [{"op": ..., "depends_on": [...], "para
 """
 from __future__ import annotations
 
-from knowledge_extractor.util.ontology import all_entities
-from knowledge_extractor.extraction.pipeline import stage, tick, write_json
+from util.ontology import all_entities
+from extraction.pipeline import stage, tick, write_json
 
 _META_OPS: dict[str, callable] = {}
 

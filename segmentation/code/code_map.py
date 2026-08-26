@@ -24,9 +24,9 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
-from knowledge_extractor.util import model_data as _md
-from knowledge_extractor.util.i18n import t
-from knowledge_extractor.util.paths import INDEX_DIR, KB_DIR, ROOT, portable_code_path
+from util import model_data as _md
+from util.i18n import t
+from util.paths import INDEX_DIR, KB_DIR, ROOT, portable_code_path
 
 # ── 命名键 / 代码域(code_domain):单一事实源 model_data/code/{naming_keys,code_domain}.json ──
 # code_domain 是 domains 的一个子集/细化:每个 code_domain 关联一个 domain(+可选 sub_domain)。
@@ -83,7 +83,7 @@ def _classify_code_domains_llm(files: list[dict]) -> dict[str, str]:
     Returns {path: code_domain}. Returns {} if the LLM is unavailable or fails, so the
     caller falls back to the keyword classifier.
     """
-    from knowledge_extractor.util.llm import LlmConfig, _call_llm
+    from util.llm import LlmConfig, _call_llm
     import json as _json
     import re as _re
 
@@ -183,7 +183,7 @@ def _verify_naming_keys(sources: list[dict]) -> dict:
     Returns an updated {key: meaning} dict; unknown keys are marked ⚠️ unverified.
     Falls back to the curated dict if the LLM is unavailable.
     """
-    from knowledge_extractor.util.llm import LlmConfig, _call_llm
+    from util.llm import LlmConfig, _call_llm
     import json as _json
     import re as _re
 

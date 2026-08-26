@@ -1,6 +1,6 @@
 """Phase 2 pipeline orchestrator — builds cross-section groups, then runs all extractors.
 
-Usage: python -m knowledge_extractor.extraction.run
+Usage: python -m extraction.run
 
 Flow:
   1. cross_group.build_extraction_groups() — embedding-based semantic grouping
@@ -16,11 +16,11 @@ from __future__ import annotations
 
 import json
 
-from knowledge_extractor.util.paths import KB_DIR, ROOT
-from knowledge_extractor.extraction.cross_group import build_extraction_groups
-from knowledge_extractor.extraction.entities.generic import extract_entity
-from knowledge_extractor.util.ontology import get as get_entity, get_optional, to_dict
-from knowledge_extractor.extraction.pipeline import PHASE2_DIR, stage, tick, write_json
+from util.paths import KB_DIR, ROOT
+from extraction.cross_group import build_extraction_groups
+from extraction.entities.generic import extract_entity
+from util.ontology import get as get_entity, get_optional, to_dict
+from extraction.pipeline import PHASE2_DIR, stage, tick, write_json
 
 
 def main() -> None:
@@ -30,7 +30,7 @@ def main() -> None:
     groups = build_extraction_groups()
 
     # ── 通用实体抽取:遍历 entities.json 中带 list_key 的实体(不硬编码实体名) ──
-    from knowledge_extractor.util.ontology import all_entities
+    from util.ontology import all_entities
     extracted = {}
     for entity_name, cls in all_entities().items():
         lk = getattr(cls, "_list_key", "")
@@ -43,10 +43,10 @@ def main() -> None:
     # extracted: {list_key -> [dict]},供后续确定性增强按需取用(不硬编码实体名)
 
     # ── 元函数增强(由 entities.json 的 meta 声明驱动:seed / group / index / synthesize) ──
-    from knowledge_extractor.util.ontology import DocSectionRecord, SourceRecord
+    from util.ontology import DocSectionRecord, SourceRecord
     # 导入元函数实现包以触发其 @register(把各实体的 seed/group/index/synthesize 登记进注册表)
-    import knowledge_extractor.extraction.meta_ops  # noqa: F401
-    from knowledge_extractor.extraction.meta import run_meta
+    import extraction.meta_ops  # noqa: F401
+    from extraction.meta import run_meta
     sources = [SourceRecord(**s) for s in json.loads((KB_DIR / "sources.json").read_text())]
     doc_sections = [DocSectionRecord(**d) for d in json.loads((KB_DIR / "doc_sections.json").read_text())]
     _RC = get_optional("ResourceRecord")
@@ -60,7 +60,7 @@ def main() -> None:
     results = run_meta(extracted, context, PHASE2_DIR)
 
     # ── Hub data(theme bundles + sub-domain labels)—— 传通用 results({list_key: [dict]}) ──
-    from knowledge_extractor.render.hubgen import build_hub_data
+    from render.hubgen import build_hub_data
     hub_data = build_hub_data(
         doc_sections=[to_dict(d) for d in doc_sections],
         entities=results,
@@ -69,11 +69,11 @@ def main() -> None:
     tick(f"saved hub_data.json ({len(hub_data)} domains, theme bundles)")
 
     # ── 9. Re-render so person page, entity index, and new families reflect all data ──
-    from knowledge_extractor.render.okf_markdown import render_index as _render_index
-    from knowledge_extractor.util.ontology import CodeUnitRecord, build_domains
+    from render.okf_markdown import render_index as _render_index
+    from util.ontology import CodeUnitRecord, build_domains
     code_units = [CodeUnitRecord(**cu) for cu in json.loads((KB_DIR / "code_units.json").read_text())]
     _render_index(build_domains(), sources, doc_sections, code_units)
-    from knowledge_extractor.render.html import convert_index_to_html
+    from render.html import convert_index_to_html
     convert_index_to_html()
     tick("re-rendered index (md + html) with enriched people + new entities")
 

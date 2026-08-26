@@ -12,7 +12,7 @@ import re
 from collections import Counter
 from pathlib import Path
 
-from knowledge_extractor.util import model_data
+from util import model_data
 
 
 # ── Honorific stripping ──
@@ -53,7 +53,7 @@ def _alias_map() -> dict[str, str]:
     """Lazy-load the alias table (built & cached by the pipeline, seed fallback)."""
     global _alias_cache
     if _alias_cache is None:
-        from knowledge_extractor.extraction.alias_map import load_alias_map
+        from extraction.alias_map import load_alias_map
         _alias_cache = load_alias_map()
     return _alias_cache
 

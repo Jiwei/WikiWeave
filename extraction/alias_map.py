@@ -13,8 +13,8 @@ import json
 import re
 from pathlib import Path
 
-from knowledge_extractor.util.paths import KB_DIR, ROOT
-from knowledge_extractor.util import model_data
+from util.paths import KB_DIR, ROOT
+from util import model_data
 
 CACHE_PATH = KB_DIR / "_alias_map.json"
 

@@ -9,9 +9,9 @@ from __future__ import annotations
 import json
 from dataclasses import fields as _dc_fields
 
-from knowledge_extractor.util import model_data
-from knowledge_extractor.util.ontology import get as _get_entity, to_dict
-from knowledge_extractor.extraction.pipeline import (
+from util import model_data
+from util.ontology import get as _get_entity, to_dict
+from extraction.pipeline import (
     PHASE2_DIR, batch_extract, checkpoint_valid, save_checkpoint_meta,
     score_confidence, sha_id, source_label, stage, tick, write_json,
 )

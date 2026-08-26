@@ -1,6 +1,6 @@
 """Phase 2 shared pipeline — LLM calling, batching, checkpoint, confidence scoring.
 
-Reuses knowledge_extractor.util.llm for API configuration.
+Reuses util.llm for API configuration.
 """
 
 from __future__ import annotations
@@ -12,9 +12,9 @@ import time as _t
 from pathlib import Path
 from typing import Any
 
-from knowledge_extractor.util.i18n import prompt_language
-from knowledge_extractor.util.llm import chat, phase_settings, available
-from knowledge_extractor.util.paths import KB_DIR
+from util.i18n import prompt_language
+from util.llm import chat, phase_settings, available
+from util.paths import KB_DIR
 
 # ── Output paths ──
 PHASE2_DIR = KB_DIR

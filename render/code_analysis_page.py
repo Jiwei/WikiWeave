@@ -7,8 +7,8 @@ from __future__ import annotations
 
 from collections import Counter
 
-from knowledge_extractor.util.i18n import t
-from knowledge_extractor.util.paths import INDEX_DIR
+from util.i18n import t
+from util.paths import INDEX_DIR
 
 
 def _table(headers: list[str], rows: list[list]) -> str:

@@ -13,8 +13,8 @@ from pathlib import Path
 import markdown
 import yaml
 
-from knowledge_extractor.util.paths import index_dir, output_dir
-from knowledge_extractor.util import model_data
+from util.paths import index_dir, output_dir
+from util import model_data
 
 INDEX_DIR = index_dir()
 OUT_DIR = output_dir()

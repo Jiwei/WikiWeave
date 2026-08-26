@@ -9,10 +9,10 @@ from __future__ import annotations
 import re
 from collections import Counter, defaultdict
 
-from knowledge_extractor.util import model_data
-from knowledge_extractor.util.ontology import get as get_entity, to_dict
-from knowledge_extractor.extraction.pipeline import sha_id
-from knowledge_extractor.extraction.meta import register
+from util import model_data
+from util.ontology import get as get_entity, to_dict
+from extraction.pipeline import sha_id
+from extraction.meta import register
 
 _PROJ = model_data.seed_patterns().get("project", {})
 _NON_PERSON = set(_PROJ.get("non_person_owner", []))

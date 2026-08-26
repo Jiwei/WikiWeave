@@ -26,8 +26,8 @@ from pathlib import Path
 from shutil import which
 from typing import Any
 
-from knowledge_extractor.util.ontology import CodeUnitRecord, SourceRecord
-from knowledge_extractor.util.paths import ROOT
+from util.ontology import CodeUnitRecord, SourceRecord
+from util.paths import ROOT
 
 
 def _tool(name: str, extra: tuple[str, ...] = ()) -> str | None:
@@ -87,8 +87,8 @@ def analyze_python(
     dep_edges: list[dict] = []
 
     # 模块点路径 → source_id(用于把 PyCG 节点/依赖解析回文件)
-    # 同时登记「带顶层包名前缀」的变体:输入根名(如 knowledge_extractor)+ 相对模块,
-    # 这样 import "knowledge_extractor.util.paths" 与相对键 "util.paths" 都能解析。
+    # 同时登记「带顶层包名前缀」的变体:输入根名(如 auto_archivist)+ 相对模块,
+    # 这样 import "auto_archivist.util.paths" 与相对键 "util.paths" 都能解析。
     root_pkg = Path(root).name
     mod_to_src: dict[str, str] = {}
     for s in py_sources:

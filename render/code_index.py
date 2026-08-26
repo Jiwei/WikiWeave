@@ -15,7 +15,7 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
-from knowledge_extractor.util.paths import index_dir, kb_dir, root, portable_code_path
+from util.paths import index_dir, kb_dir, root, portable_code_path
 
 INDEX_DIR = index_dir()
 KB_DIR = kb_dir()

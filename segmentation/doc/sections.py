@@ -5,9 +5,9 @@ import hashlib
 import re
 from pathlib import Path
 
-from knowledge_extractor.util import model_data
-from knowledge_extractor.util.ontology import DocSectionRecord, SourceRecord
-from knowledge_extractor.util.paths import ROOT
+from util import model_data
+from util.ontology import DocSectionRecord, SourceRecord
+from util.paths import ROOT
 
 HEADING_RE = re.compile(r"^(#+)\s+(.*)$")
 MSG_RE = re.compile(r"^(.+?)\s+(\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{2})$")
@@ -1040,12 +1040,12 @@ def build_section_inventory(sources: list[SourceRecord]) -> list[DocSectionRecor
             doc_secs.extend(segment_config(source.id, path))
         elif source.source_type == "weekly_report":
             # LLM-based segmentation for weekly reports (optional, with checkpoint)
-            from knowledge_extractor.util.paths import _SETTINGS
+            from util.paths import _SETTINGS
             if _SETTINGS.get("llm_seg_enabled", False):
-                from knowledge_extractor.util.llm_seg import segment_llm, load_llm_seg_checkpoint, save_llm_seg_checkpoint
+                from util.llm_seg import segment_llm, load_llm_seg_checkpoint, save_llm_seg_checkpoint
                 cached = load_llm_seg_checkpoint(source.id)
                 if cached:
-                    from knowledge_extractor.util.ontology import DocSectionRecord
+                    from util.ontology import DocSectionRecord
                     doc_secs.extend([DocSectionRecord(**c) for c in cached])
                     print(f"  LLM_seg: {path.name} → {len(cached)} sections (checkpoint)", flush=True)
                 else:

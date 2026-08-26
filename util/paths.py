@@ -110,5 +110,5 @@ INDEX_HTML_DIR = index_html_dir()
 REPORT_DIR = report_dir()
 
 def get_llm_settings(phase):
-    from knowledge_extractor.util import llm
+    from util import llm
     return llm.phase_settings(phase)
