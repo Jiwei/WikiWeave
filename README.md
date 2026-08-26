@@ -2,7 +2,7 @@
 
 > A config-driven, provenance-anchored pipeline that turns an arbitrary corpus of source materials — **code, docs, chat logs, reports, specs, anything** — into a **linked, self-contained knowledge base**: an OKF-compliant Markdown wiki + structured JSON + navigable HTML, bridging code intelligence and document intelligence.
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 
 **The self-building knowledge graph for your code and docs.** Rather than hand-curating a
@@ -305,7 +305,7 @@ recursive inventory + deferred-file collection.
 
 ## License
 
-[Apache License 2.0](LICENSE).
+[GNU Affero General Public License v3.0](LICENSE).
 
 ---
 
