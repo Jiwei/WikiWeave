@@ -1,0 +1,5 @@
+{
+  "_comment": "本体各字段的闭集枚举。仅保留基础实体的通用枚举;发现型实体的枚举由 exploration 阶段增补。",
+  "code_unit_kind": ["module", "class", "function"],
+  "person_confidence": ["HIGH", "MEDIUM", "LOW"]
+}

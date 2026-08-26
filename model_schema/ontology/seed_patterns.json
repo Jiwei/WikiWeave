@@ -1,0 +1,3 @@
+{
+  "_comment": "seed / group / index 等确定性元函数的实体专属「模式数据」(正则 + 受控词汇)。由 meta_ops/ 读取。清空后由 exploration 阶段从语料重新发现并写回。"
+}

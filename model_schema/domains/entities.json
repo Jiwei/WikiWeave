@@ -1,0 +1,15 @@
+{
+  "_comment": "领域维度的对象定义(domain dimension object model)。DomainRecord 是领域维度的基础实体(base entity),由 exploration 阶段默认产出。util/ontology.py 会与 sources/code/ontology 的 entities.json 合并统一生成 dataclass。",
+  "_schema_note": "每个实体: {layer, ontology_group, base?, doc, fields:[{name,type,default?,doc?}]}。base=true 表示基础实体(默认必填);缺省 base 即发现型实体。",
+
+  "DomainRecord": {
+    "layer": "phase1", "ontology_group": "taxonomy", "base": true,
+    "doc": "顶层领域(领域分类法的一个取值)—— 领域维度的默认基础实体",
+    "fields": [
+      {"name": "id", "type": "str"},
+      {"name": "name", "type": "str"},
+      {"name": "label", "type": "str"},
+      {"name": "description", "type": "str", "default": ""}
+    ]
+  }
+}

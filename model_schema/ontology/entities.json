@@ -1,0 +1,84 @@
+{
+  "_comment": "本体维度的实体定义。util/ontology.py 据此动态生成 dataclass。除字段 schema 外,每个实体可带 definition(LLM 抽取提示词,含 {items}/{lang}/__DOMAINS__ 占位)与 list_key(LLM 返回 JSON 中承载实体列表的键)。base=true 表示基础实体(默认必填)。",
+  "_schema_note": "每个实体: {layer, ontology_group, base?, doc, definition?, list_key?, fields:[{name,type,default?,doc?}]}。type ∈ str|int|float|bool|list|dict|str?。fields 无 default 键=必填(须排在有默认字段之前)。 每个实体还可带 render(OKF 页面渲染声明,见 entity_schema.json)。",
+  "DocSectionRecord": {
+    "layer": "phase1",
+    "ontology_group": "content-doc",
+    "base": true,
+    "doc": "文档类内容分段(非代码):聊天话题/文档标题块/周报小节/PDF小节 —— 本体维度的默认基础实体",
+    "fields": [
+      {
+        "name": "id",
+        "type": "str"
+      },
+      {
+        "name": "source_id",
+        "type": "str"
+      },
+      {
+        "name": "name",
+        "type": "str"
+      },
+      {
+        "name": "kind",
+        "type": "str"
+      },
+      {
+        "name": "section_path",
+        "type": "list",
+        "default": []
+      },
+      {
+        "name": "locator",
+        "type": "dict",
+        "default": {}
+      },
+      {
+        "name": "domains",
+        "type": "list",
+        "default": []
+      },
+      {
+        "name": "people",
+        "type": "list",
+        "default": []
+      },
+      {
+        "name": "resources",
+        "type": "list",
+        "default": []
+      },
+      {
+        "name": "code_mentions",
+        "type": "list",
+        "default": []
+      },
+      {
+        "name": "message_count",
+        "type": "int",
+        "default": 0
+      },
+      {
+        "name": "time_range",
+        "type": "str",
+        "default": ""
+      },
+      {
+        "name": "iso_week",
+        "type": "str",
+        "default": "",
+        "doc": "ISO 周 2025-W42"
+      },
+      {
+        "name": "summary",
+        "type": "str",
+        "default": ""
+      },
+      {
+        "name": "content",
+        "type": "str",
+        "default": ""
+      }
+    ]
+  }
+}

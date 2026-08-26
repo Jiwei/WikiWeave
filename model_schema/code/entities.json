@@ -1,0 +1,126 @@
+{
+  "_comment": "代码维度的对象定义(code dimension object model)。util/ontology.py 会与 ontology/entities.json 合并,统一生成 dataclass。CodeModule 是文件级建模对象(每个代码文件一份);CodeUnit 是单元级对象(module|class|function|method,其中 module 是模块级单元)。二者有重叠:CodeModule 专用于文件级元数据/import/code_domain,CodeUnit 仍是语法单元层级。",
+  "_schema_note": "每个实体: {layer, ontology_group, doc, fields:[{name,type,default?,doc?}]}。type ∈ str|int|float|bool|list|dict|str?。fields 无 default 键=必填(须排在有默认字段之前)。",
+  "CodeModuleRecord": {
+    "layer": "phase1",
+    "ontology_group": "content-code",
+    "base": true,
+    "doc": "代码模块(文件级建模):每个代码文件一份,承载文件级元数据、import 依赖与 code_domain 分类 —— 代码维度的默认基础实体",
+    "fields": [
+      {
+        "name": "id",
+        "type": "str"
+      },
+      {
+        "name": "source_id",
+        "type": "str"
+      },
+      {
+        "name": "path",
+        "type": "str"
+      },
+      {
+        "name": "language",
+        "type": "str",
+        "default": "python"
+      },
+      {
+        "name": "doc",
+        "type": "str",
+        "default": ""
+      },
+      {
+        "name": "imports",
+        "type": "list",
+        "default": []
+      },
+      {
+        "name": "summary",
+        "type": "str",
+        "default": ""
+      },
+      {
+        "name": "doc_mentions",
+        "type": "list",
+        "default": []
+      },
+      {
+        "name": "domains",
+        "type": "list",
+        "default": []
+      },
+      {
+        "name": "code_domain",
+        "type": "str",
+        "default": "",
+        "doc": "code_domain 分类(关联到 domains 的代码域,见 code_domain.json)"
+      }
+    ]
+  },
+  "CodeUnitRecord": {
+    "layer": "phase1",
+    "ontology_group": "content-code",
+    "base": true,
+    "doc": "代码类内容单元:module | class | function | method | interface | struct | enum —— 代码维度的默认基础实体",
+    "fields": [
+      {
+        "name": "id",
+        "type": "str"
+      },
+      {
+        "name": "source_id",
+        "type": "str"
+      },
+      {
+        "name": "name",
+        "type": "str"
+      },
+      {
+        "name": "kind",
+        "type": "str",
+        "doc": "module | class | function | method | interface | struct | enum"
+      },
+      {
+        "name": "language",
+        "type": "str",
+        "default": "python"
+      },
+      {
+        "name": "locator",
+        "type": "dict",
+        "default": {}
+      },
+      {
+        "name": "domains",
+        "type": "list",
+        "default": []
+      },
+      {
+        "name": "doc",
+        "type": "str",
+        "default": ""
+      },
+      {
+        "name": "imports",
+        "type": "list",
+        "default": []
+      },
+      {
+        "name": "literals",
+        "type": "list",
+        "default": []
+      },
+      {
+        "name": "doc_mentions",
+        "type": "list",
+        "default": []
+      },
+      {
+        "name": "calls",
+        "type": "list",
+        "default": [],
+        "doc": "本单元内调用到的被调符号名(调用图边的原始名)"
+      }
+    ]
+  }
+}

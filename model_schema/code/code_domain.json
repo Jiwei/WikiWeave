@@ -1,0 +1,6 @@
+{
+  "_comment": "代码域(单一事实源,原 stages.json 更名而来)。code 维度的领域分类:code_domain 是 domains 的一个子集/细化——每个 code_domain 关联一个 domain(+可选 sub_domain),使代码能被归入领域分类法。segmentation/code/code_map.py 据此做文件→code_domain 分类,并把关联的 domain/sub_domain 带到代码地图。",
+  "code_domains": [],
+  "unclassified_label": "Other / Unclassified",
+  "unclassified_description": "doesn't fit any of the above"
+}

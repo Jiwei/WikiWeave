@@ -1,0 +1,82 @@
+{
+  "_comment": "固定元函数词汇表(meta-functions)的先验设计声明。核心思想:实体可被动态发现(entities.json),但作用于实体的变换是预定义的静态操作。本文件是「meta」字段的单一事实源;exploration 阶段据此决定每个实体需要哪些增强/归并/索引,运行时 extraction/meta.py 据此派发。",
+
+  "vocabulary": ["extract", "seed", "group", "index", "synthesize"],
+
+  "meta_field_schema": {
+    "_comment": "entities.json 里每个发现型实体可带 \"meta\": [ {…} ] 数组,声明该实体需要哪些元函数及参数。",
+    "entry": {
+      "op": "string — 固定词汇表之一(见 vocabulary)",
+      "depends_on": "list<string> — 依赖的实体 list_key(可选;该实体在依赖的实体已产出后才运行)",
+      "params": "dict — op 专属参数;其中 params.kind 选择同一 op 的多种实现(注册键 = op:kind)"
+    },
+    "execution": {
+      "intra_entity": "同一实体的多个 meta 按声明顺序依次执行,每步中间结果写回 entities 供下一步读取(使 seed→group→synthesize 能串接)",
+      "inter_entity": "跨实体按 depends_on 拓扑排序;依赖的 list_key 已产出后,该实体的 meta 才运行"
+    },
+    "dispatch": "extract 由 definition + list_key 驱动(extraction/run.py 的通用抽取循环);seed/group/index/synthesize 由 meta 数组驱动(extraction/meta.py 的 run_meta)"
+  },
+
+  "ops": {
+    "extract": {
+      "purpose": "LLM 从分组内容中抽取实体实例(结构化 JSON)",
+      "module": "extraction/entities/generic.py (extract_entity)",
+      "llm": true,
+      "signature": "extract_entity(entity_name, groups) -> list[record]",
+      "kinds": {},
+      "params": "无 — 由实体字段 definition(提示词) + list_key(LLM 返回 JSON 中承载实例列表的键)驱动",
+      "depends_on": "无 — 依赖 cross_group 的分组(cross_group 独立于 meta 声明)",
+      "when": "任何需要从原始文本理解、抽取新实例的实体(如 Task/Error/Workflow/Protocol);只需写 definition + list_key,无需写 meta 数组"
+    },
+
+    "seed": {
+      "purpose": "确定性从内容发现实体实例(规格解析 / 正则模式),不调用 LLM",
+      "module": "extraction/meta_ops/seed.py",
+      "llm": false,
+      "signature": "seed(cls, params, context, entities) -> list[dict]",
+      "kinds": {
+        "spec": "解析结构化规格文档 → 实例(当前:source/project/ 规格 → curated Project)。params: {source_type, spec_file}",
+        "regex": "正则 + 内容驱动 + 毕业规则 → 实例(当前:语料 → Artifact)。模式数据在 seed_patterns.json"
+      },
+      "params": "kind(必填,选择实现);spec 另有 source_type / spec_file",
+      "depends_on": "按需 — 如 regex seed 依赖 projects(项目产出的交付物由项目 seed 而来)",
+      "when": "某实体可被确定性规则/正则从语料可靠发现时,先用 seed 打底,再用 LLM(extract/synthesize)补漏"
+    },
+
+    "group": {
+      "purpose": "子实体归并/聚合到父实体(rollup + 未匹配项聚类提升)",
+      "module": "extraction/meta_ops/group.py",
+      "llm": false,
+      "signature": "group(cls, params, context, entities) -> list[dict]",
+      "kinds": {},
+      "params": "weights(各信号权重,如 {key_match, domain_overlap, title_token, code_stem})、min_score、margin(评分阈值与胜出边际)",
+      "depends_on": "被归并的子实体 list_key(如 tasks)",
+      "when": "一个实体是另一个实体的子集/从属(如 task→project):用 group 表达「用子实体填充父实体」"
+    },
+
+    "index": {
+      "purpose": "聚合跨源提及为实体实例(合并去重 + 置信度分桶)",
+      "module": "extraction/meta_ops/index.py",
+      "llm": false,
+      "signature": "index(cls, params, context, entities) -> list[dict]",
+      "kinds": {},
+      "params": "sources(聚合哪些来源,如 [chat, filename, section, task])",
+      "depends_on": "按需 — 如人物索引依赖 tasks(task 里的人物提及)",
+      "when": "某实体分散在多个来源、需跨源归一(如 Person:聊天说话人/文件署名/章节元数据/任务提及 → 去重成唯一人物)"
+    },
+
+    "synthesize": {
+      "purpose": "LLM 精炼已发现的实体实例(补字段 / 派生标题 / 合成详情),用 definition 系列提示词",
+      "module": "extraction/meta_ops/synthesize.py",
+      "llm": true,
+      "signature": "synthesize(cls, params, context, entities) -> list[dict]",
+      "kinds": {
+        "title": "派生人类可读标题(当前:curated Project 的语义标题,definition)",
+        "": "后补缺失实例 + 合成详情(当前:Artifact 的 backfill + detail synthesis,definition_backfill / definition_synthesis)"
+      },
+      "params": "kind(选择实现);提示词在实体的 definition / definition_backfill / definition_synthesis 字段",
+      "depends_on": "按需 — 如 Artifact synthesize 依赖 tasks + protocols(后补扫描其标题/名称)",
+      "when": "seed/index 产出骨架后,用 LLM 填充语义内容、提升可读性;或补 seed 漏掉的实例"
+    }
+  }
+}

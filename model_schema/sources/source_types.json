@@ -1,0 +1,5 @@
+{
+  "_comment": "来源发现与路由(单一事实源)。rules 由 exploration 阶段从语料发现并写回;default 为未命中规则时的兜底 source_type。",
+  "rules": [],
+  "default": "doc"
+}

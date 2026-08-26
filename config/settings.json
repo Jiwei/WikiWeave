@@ -1,0 +1,28 @@
+{
+  "_comment": "通用知识抽取工具主配置。所有相对路径以包根 knowledge_extractor/ 为基准。input_path 为待抽取的本地目录,可由 CLI 覆盖。",
+
+  "input_path": "",
+  "output_dir": "artifact",
+  "model_data_dir": "model_data",
+  "language": "en",
+
+  "output": {
+    "knowledge_bits_subdir": "knowledge_bits",
+    "index_subdir": "index",
+    "index_html_subdir": "index_html",
+    "reports_subdir": "reports"
+  },
+
+  "source": {
+    "ignore_hidden": true,
+    "hash_head_bytes": 65536,
+    "_note": "只读前 hash_head_bytes + size + mtime 做增量指纹,大文件不全量读"
+  },
+
+  "pipeline": {
+    "enable_exploration": true,
+    "enable_llm_segmentation": false,
+    "checkpoint": true,
+    "_note": "enable_exploration=true 时先跑 EDA/知识建模并回写 model_data;enable_llm_segmentation 见 llm_seg"
+  }
+}

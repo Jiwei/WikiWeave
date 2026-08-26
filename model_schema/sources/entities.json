@@ -1,0 +1,21 @@
+{
+  "_comment": "来源维度的对象定义(source dimension object model)。SourceRecord 是来源维度的基础实体(base entity),由 exploration 阶段默认必填产出。util/ontology.py 会与 code/entities.json、ontology/entities.json 合并统一生成 dataclass。",
+  "_schema_note": "每个实体: {layer, ontology_group, base?, doc, fields:[{name,type,default?,doc?}]}。base=true 表示基础实体(默认必填,由 pipeline 确定性阶段产出,而非 LLM 发现);缺省 base 即发现型实体。",
+
+  "SourceRecord": {
+    "layer": "phase1", "ontology_group": "provenance", "base": true,
+    "doc": "一份源材料文件(去重后)—— 来源维度的基础实体,exploration 阶段默认产出",
+    "fields": [
+      {"name": "id", "type": "str"},
+      {"name": "path", "type": "str"},
+      {"name": "source_type", "type": "str"},
+      {"name": "file_type", "type": "str"},
+      {"name": "title", "type": "str"},
+      {"name": "hash", "type": "str"},
+      {"name": "people_mentions", "type": "list", "default": []},
+      {"name": "sections", "type": "list", "default": []},
+      {"name": "domains", "type": "list", "default": []},
+      {"name": "metadata", "type": "dict", "default": {}}
+    ]
+  }
+}

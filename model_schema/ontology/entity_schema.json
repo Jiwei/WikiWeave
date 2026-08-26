@@ -1,0 +1,240 @@
+{
+  "_comment": "实体定义 schema 的先验声明。一个实体对象(entities.json 里的顶层值)有哪些字段、每个字段的类型/必填/闭集取值,都在这一个文件里定死。加 render 之后,实体模型已完整定型:字段(schema)、抽取(definition/list_key)、变换(meta)、渲染(render)。exploration 阶段据此设计实体;runtime util/ontology.py 据此生成 dataclass。",
+  "entity_object": {
+    "layer": {
+      "type": "string",
+      "required": true,
+      "enum": [
+        "phase1",
+        "phase2"
+      ],
+      "doc": "实体产出的阶段(phase1=分割/默认基础,phase2=抽取)"
+    },
+    "ontology_group": {
+      "type": "string",
+      "required": true,
+      "doc": "本体分组标签(如 taxonomy/actor/entity/reference/provenance/content-doc)"
+    },
+    "base": {
+      "type": "bool",
+      "required": false,
+      "default": false,
+      "doc": "true=基础实体(默认必填,由 exploration/segmentation 产出);否则为发现型实体"
+    },
+    "doc": {
+      "type": "string",
+      "required": false,
+      "doc": "实体的一句话说明"
+    },
+    "definition": {
+      "type": "string",
+      "required": false,
+      "doc": "LLM 抽取提示词;含占位符 {items}(分组内容)、{lang}(输出语言)、__DOMAINS__(领域闭集)"
+    },
+    "list_key": {
+      "type": "string",
+      "required": false,
+      "doc": "LLM 返回 JSON 中承载该实体实例列表的键(如 \"tasks\"),也是 run_meta 的产物键"
+    },
+    "definition_backfill": {
+      "type": "string",
+      "required": false,
+      "doc": "多提示词实体用的补漏提示词(如 Artifact backfill)"
+    },
+    "definition_synthesis": {
+      "type": "string",
+      "required": false,
+      "doc": "多提示词实体用的详情合成提示词(如 Artifact detail synthesis)"
+    },
+    "meta": {
+      "type": "array",
+      "required": false,
+      "doc": "元函数声明数组;条目结构见 meta_functions.json 的 meta_field_schema"
+    },
+    "render": {
+      "type": "object",
+      "required": false,
+      "doc": "OKF 页面渲染声明;结构见下方 render_schema"
+    },
+    "fields": {
+      "type": "array",
+      "required": true,
+      "doc": "实体字段列表;条目结构见 field_entry"
+    }
+  },
+  "field_entry": {
+    "_comment": "fields 数组里每个条目(一个字段)的 schema。",
+    "name": {
+      "type": "string",
+      "required": true,
+      "doc": "字段名(dataclass 属性名)"
+    },
+    "type": {
+      "type": "string",
+      "required": true,
+      "enum": [
+        "str",
+        "int",
+        "float",
+        "bool",
+        "list",
+        "dict",
+        "str?"
+      ],
+      "doc": "字段类型;str?=Optional[str]"
+    },
+    "default": {
+      "type": "any",
+      "required": false,
+      "doc": "默认值;无 default 的必填字段须排在有默认字段之前(dataclass 约束)"
+    },
+    "doc": {
+      "type": "string",
+      "required": false,
+      "doc": "字段说明"
+    },
+    "ref": {
+      "type": "string",
+      "required": false,
+      "doc": "该字段指向的目标实体类型(Record 名);值为目标实体的 id 或 name(见 ref_key)"
+    },
+    "ref_key": {
+      "type": "string",
+      "required": false,
+      "enum": [
+        "id",
+        "name"
+      ],
+      "default": "id",
+      "doc": "ref 的键:id=实例 id,name=实例 name(如 person/owner 字段存人名)"
+    }
+  },
+  "field_types": [
+    "str",
+    "int",
+    "float",
+    "bool",
+    "list",
+    "dict",
+    "str?"
+  ],
+  "render_schema": {
+    "_comment": "实体 render 字段的结构(如何把该实体渲染成 OKF 页面)。",
+    "page_dir": {
+      "type": "string",
+      "required": true,
+      "doc": "INDEX_DIR 下的输出子目录(如 projects/artifacts/infos/tasks)"
+    },
+    "kind_label": {
+      "type": "string",
+      "required": true,
+      "doc": "frontmatter type + 索引页标题(如 Project/Artifact/Task)"
+    },
+    "slug_field": {
+      "type": "string",
+      "required": true,
+      "doc": "页面文件名(去 .md)用的字段,也是稳定 id(如 name/id)"
+    },
+    "title_field": {
+      "type": "string",
+      "required": false,
+      "doc": "详情页 H1 用的字段;缺失回退 slug_field"
+    },
+    "detail": {
+      "type": "array",
+      "required": true,
+      "doc": "详情页分节(顺序即渲染顺序);条目见 render_detail_entry"
+    },
+    "index": {
+      "type": "object",
+      "required": true,
+      "doc": "索引页结构;见 render_index_schema"
+    },
+    "hub_role": {
+      "type": "string",
+      "required": false,
+      "enum": [
+        "seed",
+        "fold"
+      ],
+      "doc": "hub bundle 构造中的角色:seed=锚点(项目/交付物),fold=折叠进重叠束(薄实体)"
+    },
+    "hub_bridge": {
+      "type": "bool",
+      "required": false,
+      "default": false,
+      "doc": "fold 时是否需 cu→section 桥接(代码锚点的 protocol 类实体)"
+    },
+    "nav_hint": {
+      "type": "string",
+      "required": false,
+      "doc": "主索引「what you are looking for」的查询意图短语(英文)"
+    }
+  },
+  "render_detail_entry": {
+    "_comment": "render.detail 里每个分节的 schema。",
+    "type": {
+      "type": "string",
+      "required": true,
+      "enum": [
+        "bullets",
+        "text",
+        "list",
+        "links"
+      ],
+      "doc": "bullets=键值行;text=单字段正文;list=字符串数组(可 code 反引号);links=跨实体链接"
+    },
+    "heading": {
+      "type": "string",
+      "required": false,
+      "doc": "分节标题(## Heading)"
+    },
+    "items": {
+      "type": "array",
+      "required": false,
+      "doc": "type=bullets 时的键值项:{field, label}"
+    },
+    "field": {
+      "type": "string",
+      "required": false,
+      "doc": "type=text/list/links 时读取的字段"
+    },
+    "code": {
+      "type": "bool",
+      "required": false,
+      "default": false,
+      "doc": "type=list 时是否用反引号包裹"
+    },
+    "target": {
+      "type": "string",
+      "required": false,
+      "doc": "type=links 时的目标路径模板,{id} 占位(如 infos/tasks/{id}.md)"
+    },
+    "label_field": {
+      "type": "string",
+      "required": false,
+      "doc": "type=links 时决定显示文本的字段(如 title/name)"
+    }
+  },
+  "render_index_schema": {
+    "_comment": "render.index 的结构(实体索引页)。",
+    "group_by": {
+      "type": "string|null",
+      "required": false,
+      "enum": [
+        null,
+        "week",
+        "scope",
+        "domains",
+        "kind"
+      ],
+      "doc": "索引页按什么分组(null=不分组,平铺表格;kind=按 subdir_field 分目录)"
+    },
+    "rows": {
+      "type": "array",
+      "required": false,
+      "doc": "表格列:{field, link?};group_by=null 时用"
+    }
+  },
+  "meta_entry_ref": "meta 数组条目的结构见 model_data/ontology/meta_functions.json 的 meta_field_schema(单一事实源,不在此重复)"
+}
