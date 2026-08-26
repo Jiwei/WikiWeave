@@ -1,6 +1,6 @@
 # Auto-Archivist
 
-> A config-driven, provenance-anchored pipeline that turns an arbitrary corpus of source materials — **code, docs, chat logs, reports, specs, anything** — into a **linked, self-contained knowledge base**: an OKF-compliant Markdown wiki + structured JSON + navigable HTML, bridging code intelligence and document intelligence.
+> A config-driven, provenance-anchored pipeline that turns an arbitrary corpus of source materials — **code, docs, chat logs, reports, specs, anything** — into a **linked, self-contained knowledge base**: an OKF-compliant Markdown wiki + structured JSON + navigable HTML with meta ontology schema and mining functions, bridging code intelligence and document intelligence.
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
@@ -14,12 +14,12 @@ and mines an arbitrary corpus into a queryable, cross-linked, auditable graph.
 
 ## What it does
 
-Teams accumulate knowledge in messy, unstructured form: chat threads, one-off READMEs, weekly
+Individual and teams often accumulate knowledge in messy, unstructured form: chat threads, one-off READMEs, weekly
 reports, scripts whose "why" lives only in someone's head. **Vector stores store embeddings, not
 meaning** — context you can't explain and links you can't trace. Auto-Archivist turns that corpus
 into a *queryable, cross-linked* knowledge graph where:
 
-- **Every entity** (a task, an error-and-fix, a workflow, a protocol, a project, an artifact, a
+- **Every entity** (a task, an error-and-fix, a workflow, a
   person) carries a **provenance trail** back to the exact source section that produced it.
 - **Code ↔ doc linking** connects source files to the narrative that explains them.
 - The output is **OKF-compliant Markdown** — readable by humans *and* loadable by AI agents,
@@ -34,22 +34,22 @@ means editing JSON, not Python.
 
 ## Why Auto-Archivist
 
-| | Plain RAG / vector store | Hand-curated wiki | **Auto-Archivist** |
-|---|---|---|---|
-| **How links form** | embedding similarity | manual, best-effort | deterministic + LLM, traced |
-| **Provenance** | none | anecdotal | every entity → source section |
-| **Entity model** | none (flat chunks) | ad hoc | config-driven ontology |
-| **Domain adaptation** | retrain / re-embed | rewrite docs | edit JSON (`model_data/`) |
-| **Code ↔ doc bridge** | no | no | yes (AST + tree-sitter) |
-| **Auditability** | "why" is opaque | "why" is someone's memory | every claim traces to raw material |
-| **Agent-readable output** | only via API | no | OKF Markdown, grep-able by anyone |
+|                           | Plain RAG / vector store | Hand-curated wiki         | **Auto-Archivist**                 |
+| ------------------------- | ------------------------ | ------------------------- | ---------------------------------- |
+| **How links form**        | embedding similarity     | manual, best-effort       | deterministic + LLM, traced        |
+| **Provenance**            | none                     | anecdotal                 | every entity → source section      |
+| **Entity model**          | none (flat chunks)       | ad hoc                    | config-driven ontology             |
+| **Domain adaptation**     | retrain / re-embed       | rewrite docs              | edit JSON (`model_data/`)          |
+| **Code ↔ doc bridge**     | no                       | no                        | yes (AST + tree-sitter)            |
+| **Auditability**          | "why" is opaque          | "why" is someone's memory | every claim traces to raw material |
+| **Agent-readable output** | only via API             | no                        | OKF Markdown, grep-able by anyone  |
 
 ---
 
 ## Who it's for
 
 - **Platform / infra teams** that want a self-maintaining internal knowledge base over mixed code + docs.
-- **Research teams** (quant, ML, engineering) whose "why" lives in chat logs and weekly reports.
+- **R&D teams** (quant, ML, engineering) whose "why" lives in codes, chats and weekly reports, while the knowledge landscape keep being updated.
 - **AI-agent builders** that need a clean, provenance-anchored context layer instead of raw chunks.
 - **Anyone inheriting a messy repo** who needs to reconstruct *what exists and why* from the corpus itself.
 
@@ -139,18 +139,19 @@ replaced or extended independently.
                          └────────────────────────────────────────────────┘
 ```
 
-| Stage | Package | What it does |
-|---|---|---|
-| **Exploration** | `exploration/inventory.py` | Recursively walks the input directory, dedups by content hash, and routes each file to a source type using **data-driven rules** (`model_data/sources/source_types.json`). |
-| **Segmentation** | `segmentation/doc/`, `segmentation/code/` | Splits documents into sections (headings, chat speaker turns, font-aware PDF, style-aware DOCX) and code into units (Python `ast`, tree-sitter for other languages); classifies each into one or more **domains** (LLM-primary, keyword fallback). |
-| **Extraction** | `extraction/` | Groups related sections, then runs **structured LLM extraction** of tasks, errors, workflows, protocols, projects, and artifacts; builds a normalized **people index** with aliases and confidence. |
-| **Linking + Render** | `render/`, `segmentation/code/scan.py` | Bakes **links** (code↔doc, entity↔source backlinks, search tags), then renders the self-contained **OKF Markdown wiki**, HTML, code map, call/dependency graphs, and a glossary (`TERMS.md`). |
+| Stage                | Package                                   | What it does                                                                                                                                                                                                                                       |
+| -------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Exploration**      | `exploration/inventory.py`                | Recursively walks the input directory, dedups by content hash, and routes each file to a source type using **data-driven rules** (`model_data/sources/source_types.json`).                                                                         |
+| **Segmentation**     | `segmentation/doc/`, `segmentation/code/` | Splits documents into sections (headings, chat speaker turns, font-aware PDF, style-aware DOCX) and code into units (Python `ast`, tree-sitter for other languages); classifies each into one or more **domains** (LLM-primary, keyword fallback). |
+| **Extraction**       | `extraction/`                             | Groups related sections, then runs **structured LLM extraction** of tasks, errors, workflows, protocols, projects, and artifacts; builds a normalized **people index** with aliases and confidence.                                                |
+| **Linking + Render** | `render/`, `segmentation/code/scan.py`    | Bakes **links** (code↔doc, entity↔source backlinks, search tags), then renders the self-contained **OKF Markdown wiki**, HTML, code map, call/dependency graphs, and a glossary (`TERMS.md`).                                                      |
 
 ---
 
 ## Design philosophy
 
 ### 1. Data-driven over hard-coded
+
 The single most important decision. Everything domain-specific lives in JSON along **four fixed
 dimensions** (`code/`, `domains/`, `ontology/`, `sources/`), split between **`model_schema/`** (the
 pre-defined structure — entity schema, base entities, generic vocabularies) and **`model_data/`**
@@ -160,31 +161,37 @@ pre-defined structure — entity schema, base entities, generic vocabularies) an
 rather than "a one-off tool that happens to be configurable."
 
 ### 2. Deterministic-first, LLM-enhanced, graceful degradation
+
 Every LLM step has a **deterministic fallback** (keyword matching, heuristics). If the LLM is
 unavailable or a call fails, the pipeline **degrades instead of dying** — it emits lower-fidelity
 but still-valid output. LLM calls are batched, checkpointed, and retried with backoff.
 
 ### 3. Provenance-anchored
+
 Every claim is traceable. Entities carry `source_sections` (the section IDs that produced them),
 sections carry `source_id` + `locator` (file/line), and the inventory records content hashes.
 Nothing in the output is asserted without a path back to the raw material.
 
 ### 4. Config-driven ontology
+
 The entity schema is the single source of truth for the data model. `util/ontology.py` generates the
 record dataclasses at import time, so the schema is data — field additions/removals are a JSON edit,
 not a code change. A field may declare a **cross-entity reference** (`ref` + `ref_key`), e.g. a task's
 `people` → `PersonRecord` by name.
 
 ### 5. Self-contained, human- *and* agent-friendly output
+
 The rendered wiki follows the OKF convention (markdown files with `type` frontmatter, standard links
 = knowledge graph). It is browsable in any editor/Obsidian, grep-able by humans, and loadable by
 agents — no database or runtime required to *read* the result.
 
 ### 6. Immutable sources, idempotent pipeline
+
 Raw sources are never modified. The pipeline is resumable (phase-level checkpoints keyed by content
 hash + schema version), so re-running after adding materials only does incremental work.
 
 ### 7. Meta entity modeling and meta-functions
+
 Entities are discovered dynamically, but the **transformations** on them are a small fixed set —
 **extract · seed · group · index · synthesize** — declared per-entity as a `meta` array in
 `ontology/entities.json` and dispatched by `extraction/meta.py`:
@@ -200,6 +207,7 @@ generic code. The canonical registries are [`model_schema/ontology/meta_function
 and [`model_schema/ontology/entity_schema.json`](model_schema/ontology/entity_schema.json).
 
 ### 8. Base entities + bidirectional linking
+
 The graph rests on five **base entities** — **Source, Domain, DocSection, CodeModule, CodeUnit** —
 produced deterministically by exploration/segmentation. Everything else (**Task, Error, Workflow,
 Protocol, Project, Artifact, Person, Resource**, …) is a **discovered** entity, mined from the base
