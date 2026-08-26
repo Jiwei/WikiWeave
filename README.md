@@ -14,7 +14,7 @@ and mines an arbitrary corpus into a queryable, cross-linked, auditable graph.
 
 ## What it does
 
-Individual and teams often accumulate knowledge in messy, unstructured form: chat threads, one-off READMEs, weekly
+Teams often accumulate knowledge in messy, unstructured form: chat threads, one-off READMEs, weekly
 reports, scripts whose "why" lives only in someone's head. **Vector stores store embeddings, not
 meaning** — context you can't explain and links you can't trace. Auto-Archivist turns that corpus
 into a *queryable, cross-linked* knowledge graph where:
@@ -49,7 +49,7 @@ means editing JSON, not Python.
 ## Who it's for
 
 - **Platform / infra teams** that want a self-maintaining internal knowledge base over mixed code + docs.
-- **R&D teams** (quant, ML, engineering) whose "why" lives in codes, chats and weekly reports, while the knowledge landscape keep being updated.
+- **R&D teams** (quant, ML, engineering) whose "why" lives in codes, chats and weekly reports, while the knowledge landscape being updated constantly.
 - **AI-agent builders** that need a clean, provenance-anchored context layer instead of raw chunks.
 - **Anyone inheriting a messy repo** who needs to reconstruct *what exists and why* from the corpus itself.
 
