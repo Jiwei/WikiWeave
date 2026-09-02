@@ -86,10 +86,12 @@ def extract_entity(entity_name: str, groups: list[list[dict]]) -> list:
             if not isinstance(e, dict):
                 continue
             kw = {k: v for k, v in e.items() if k in field_names}
-            # 组派生字段回填
+            # 组派生字段回填(仅回填非空派生值,避免覆盖实体默认值,如 ProtocolRecord.source_type='code')
             for field, fn in _GROUP_DERIVED.items():
                 if field in field_names and not kw.get(field):
-                    kw[field] = fn(group)
+                    val = fn(group)
+                    if val:
+                        kw[field] = val
             # id 是必填字段但 LLM 不返回,须在构造 dataclass 前生成(原版在构造器里 id=sha_id(...))
             if "id" in field_names and not kw.get("id"):
                 id_key = f"{group[0].get('id', '') if group else ''}:{kw.get(id_field, '') if id_field else ''}:{idx}"

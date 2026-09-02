@@ -361,6 +361,18 @@ def _render_domain_topics(dname: str, ddir: Path, appendix_link: str) -> None:
         _write(topics_dir / f"{slug}.md",
                _fm("Bundle", b["title"], f"{b.get('member_count',0)} sections") + "\n".join(blines) + "\n")
 
+    # 清理历史残留:bundle title 每次重跑会变,旧 detail 页会残留;删除非当前 hub_data 生成的 .md
+    expected = {"index.md"}
+    for sd in sub_bundles:
+        expected.add(f"{_slug(sd)}.md")
+    for b in bundles:
+        if b.get("member_count", 0) > 40:
+            expected.add(f"{_slug(b['title'])}.md")
+    if topics_dir.exists():
+        for f in topics_dir.glob("*.md"):
+            if f.name not in expected:
+                f.unlink()
+
 
 
 
