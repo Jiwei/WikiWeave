@@ -2,4 +2,5 @@
 *.ruff_cache
 artifact
 model_data/
+config/llm.json
 
