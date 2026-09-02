@@ -49,7 +49,7 @@ def _rel_link(target: str, depth: int) -> str:
 def _source_link_or_text(path: str, depth: int) -> str:
     """Render a source reference: portable plain text for code sources (not bundled in
     the artifact), a relative markdown link otherwise."""
-    if path.startswith("source/code/"):
+    if path.startswith("code/"):
         return portable_code_path(path)
     return _rel_link(path, depth)
 
@@ -786,7 +786,7 @@ Browsable code structure pages generated from AST analysis — imports, function
         funcs = [cu.name for cu in culist if cu.kind == "function"]
         doc = " ".join(cu.doc for cu in culist if cu.doc)
         code_domain = _classify_code_domain(src.path, doc, funcs)
-        code_domain_modules[stage][sid] = culist
+        code_domain_modules[code_domain][sid] = culist
 
     cu_lines = [
         f"# Code Units ↔ Doc Sections ({len(canonical_units)})",
@@ -1336,15 +1336,15 @@ def _render_entity_pages(entity_name: str, cls, records: list, context: dict) ->
                     cu = context.get("code_units_by_id", {}).get(cuid)
                     if not cu:
                         continue
-                    csrc = context.get("source_by_id", {}).get(cu.get("source_id"))
+                    csrc = context.get("source_by_id", {}).get(cu.source_id)
                     if csrc:
-                        page = csrc["path"].replace("/", "_") + ".md"
+                        page = csrc.path.replace("/", "_") + ".md"
                         if (INDEX_DIR / "code" / page).exists():
-                            code_links.append(f"- [`{cu.get('name','')}` ({cu.get('kind','')})]({prefix}code/{page})")
+                            code_links.append(f"- [`{cu.name}` ({cu.kind})]({prefix}code/{page})")
                         else:
-                            code_links.append(f"- `{cu.get('name','')}`")
+                            code_links.append(f"- `{cu.name}`")
                     else:
-                        code_links.append(f"- `{cu.get('name','')}`")
+                        code_links.append(f"- `{cu.name}`")
                 if code_links:
                     parts.append("\n## Related code\n" + "\n".join(code_links) + "\n")
             elif extra == "related_resources" and r.get("related_resources"):
@@ -1361,7 +1361,7 @@ def _render_entity_pages(entity_name: str, cls, records: list, context: dict) ->
         for sid in r.get("source_sections", []):
             sec = sections_by_id.get(sid)
             if sec:
-                src.append(f"- [{sec.get('name','')[:80]}]({prefix}sections/{sid}.md)")
+                src.append(f"- [{sec.name[:80]}]({prefix}sections/{sid}.md)")
         if src:
             parts.append("\n## Source sections\n" + "\n".join(src) + "\n")
 
@@ -1476,7 +1476,7 @@ def _server_access_section(a: dict, sections_by_id: dict) -> str:
         sec = sections_by_id.get(sid)
         if not sec:
             continue
-        text = sec.get("content", "")
+        text = sec.content
         # strip speaker prefixes (e.g. "李四: ") then collect ssh config tokens
         for line in text.splitlines():
             clean = _re.sub(r"^[一-鿿A-Za-z]+[:：]\s*", "", line).strip()

@@ -350,7 +350,7 @@ def build_seed_records(
 
 @register("seed", "spec")
 def seed_projects(cls, params, context, entities):
-    """确定性 seed:解析 source/project/ 规格文档 → curated projects(不含 rollup)。"""
+    """确定性 seed:解析 project/ 规格文档 → curated projects(不含 rollup)。"""
     sources = context["sources"]
     doc_sections = context["doc_sections"]
     sections_by_id = {ds.id: ds for ds in doc_sections}
@@ -358,7 +358,7 @@ def seed_projects(cls, params, context, entities):
     for ds in doc_sections:
         sections_by_source.setdefault(ds.source_id, []).append(ds.id)
     source_by_path = {s.path: s for s in sources}
-    project_root = ROOT / "source" / "project"
+    project_root = ROOT / "project"
     curated: list = []
     project_dirs = (sorted(d for d in project_root.iterdir() if d.is_dir() and not d.name.startswith("."))
                     if project_root.exists() else [])
@@ -380,6 +380,12 @@ def seed_resources(cls, params, context, entities):
     """确定性 seed:扫描 section 文本 → 资源引用(ResourceRecord)。"""
     from extraction.literals import extract_resources
     return [to_dict(r) for r in extract_resources(context["sources"], context["doc_sections"])]
+
+
+@register("seed", "asset_class")
+def seed_asset_classes(cls, params, context, entities):
+    """确定性 seed:从 model_data 读取资产类别(语料特定静态配置,如 comm/fut/cb)。"""
+    return model_data.load_or_empty("ontology/asset_classes", [])
 
 
 @register("seed", "regex")

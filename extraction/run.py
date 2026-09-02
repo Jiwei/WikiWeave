@@ -50,7 +50,7 @@ def main() -> None:
     sources = [SourceRecord(**s) for s in json.loads((KB_DIR / "sources.json").read_text())]
     doc_sections = [DocSectionRecord(**d) for d in json.loads((KB_DIR / "doc_sections.json").read_text())]
     _RC = get_optional("ResourceRecord")
-    resources = [_RC(**r) for r in json.loads((KB_DIR / "resources.json").read_text())] if _RC else []
+    resources = [_RC(**r) for r in json.loads((KB_DIR / "resources.json").read_text())] if (_RC and (KB_DIR / "resources.json").exists()) else []
     code_units = json.loads((KB_DIR / "code_units.json").read_text()) if (KB_DIR / "code_units.json").exists() else []
 
     context = {

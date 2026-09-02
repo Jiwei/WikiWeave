@@ -90,13 +90,14 @@ def extract_entity(entity_name: str, groups: list[list[dict]]) -> list:
             for field, fn in _GROUP_DERIVED.items():
                 if field in field_names and not kw.get(field):
                     kw[field] = fn(group)
+            # id 是必填字段但 LLM 不返回,须在构造 dataclass 前生成(原版在构造器里 id=sha_id(...))
+            if "id" in field_names and not kw.get("id"):
+                id_key = f"{group[0].get('id', '') if group else ''}:{kw.get(id_field, '') if id_field else ''}:{idx}"
+                kw["id"] = sha_id(prefix, id_key)
             try:
                 record = cls(**kw)
             except TypeError:
                 continue  # 缺必填字段 → 跳过该条
-            if not record.id:
-                key = f"{group[0].get('id', '') if group else ''}:{getattr(record, id_field, '') if id_field else ''}:{idx}"
-                record.id = sha_id(prefix, key)
             record._confidence = score_confidence(to_dict(record), key_fields)
             records.append(record)
 

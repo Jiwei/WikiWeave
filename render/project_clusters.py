@@ -52,7 +52,7 @@ _GENERIC_TOKENS = {
     "latest", "wip", "dev", "src", "main", "to", "for", "of", "and", "the",
 }
 
-_CODE_ROOT = "source/code"
+_CODE_ROOT = "code"
 
 
 # ── path helpers ──
@@ -81,15 +81,15 @@ def _stem(path_str: str) -> str:
 
 
 def _pile_dir(path_str: str) -> str:
-    """Directory of a `source/code/` file, relative to `source/code/`.
+    """Directory of a `code/` file, relative to `code/`.
 
     Returns '' for a loose top-level script. For a non-pile path this returns the
-    parent directory as a best effort — callers pre-filter to `source/code/` files.
+    parent directory as a best effort — callers pre-filter to `code/` files.
     """
     parts = Path(path_str).parts
-    # parts == ('source', 'code', <subdirs…>, <filename>)
-    if len(parts) >= 3 and parts[0] == "source" and parts[1] == "code":
-        return "/".join(parts[2:-1])
+    # parts == ('code', <subdirs…>, <filename>)
+    if len(parts) >= 2 and parts[0] == "code":
+        return "/".join(parts[1:-1])
     return "/".join(parts[:-1])
 
 
@@ -114,7 +114,7 @@ def _display_label(c: dict) -> str:
 # ── Stage 1: universal signals ──
 
 def _load_code_files() -> list[dict]:
-    """Load `code_file` sources under `source/code/` (the pile), excluding
+    """Load `code_file` sources under `code/` (the pile), excluding
     `.ipynb_checkpoints` (per-file notebook mirrors, not real code)."""
     sources = _load_json("sources.json")
     files = []
@@ -124,8 +124,8 @@ def _load_code_files() -> list[dict]:
         p = s["path"]
         if ".ipynb_checkpoints" in p:
             continue
-        if not p.startswith("source/code/"):
-            continue  # curated source/project code is not part of the pile
+        if not p.startswith("code/"):
+            continue  # curated project code is not part of the pile
         files.append({
             "source_id": s["id"],
             "path": p,
@@ -371,10 +371,10 @@ def _normalized_dir_key(dirname: str, generic_tokens: set[str]) -> str:
 
 def _curated_code_refs() -> dict[str, str]:
     """Map canonical file stem → curated project name, from `对应代码` in
-    `source/project/*.md` specs. The spec's 任务信息 block lists the code files a
+    `project/*.md` specs. The spec's 任务信息 block lists the code files a
     curated project owns; this is the authoritative project↔code anchor."""
     stem_to_project: dict[str, str] = {}
-    project_dir = ROOT / "source" / "project"
+    project_dir = ROOT / "project"
     if not project_dir.exists():
         return stem_to_project
     for md in project_dir.rglob("*.md"):

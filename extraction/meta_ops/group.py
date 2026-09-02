@@ -17,6 +17,16 @@ from extraction.meta import register
 _PROJ = model_data.seed_patterns().get("project", {})
 _NON_PERSON = set(_PROJ.get("non_person_owner", []))
 _FAMILY_STOPWORDS = set(_PROJ.get("family_title_stopwords", []))
+_ASSET_KW = _PROJ.get("asset_kw", {})
+
+
+def _asset_from_text(text: str) -> str:
+    """资产类别签名(comm/fut/cb),关键词表来自 model_data/ontology/seed_patterns.json。"""
+    tl = (text or "").lower()
+    for ac, kws in _ASSET_KW.items():
+        if any(k.lower() in tl for k in kws):
+            return ac
+    return "none"
 
 
 def _task_project_score(task: dict, project, weights: dict) -> float:
@@ -97,10 +107,11 @@ def _promote_generated_projects(
     clusters: dict[tuple, list[dict]] = defaultdict(list)
     for t in unmapped:
         dom = (t.get("domains") or ["others"])[0]
-        clusters[dom].append(t)
+        asset = _asset_from_text(t.get("title", "") + " " + (t.get("progress") or ""))
+        clusters[(dom, asset)].append(t)
 
     generated: list = []
-    for dom, cl in sorted(clusters.items()):
+    for (dom, asset), cl in sorted(clusters.items()):
         member_secs = sorted({sid for t in cl for sid in t.get("source_sections", [])})
         person_counts = Counter(t.get("person", "unknown") for t in cl
                                 if t.get("person") not in ("", "unknown", *_NON_PERSON))
@@ -108,12 +119,13 @@ def _promote_generated_projects(
         title = _family_title(cl, dom)
         name = re.sub(r"[^A-Za-z0-9_]+", "_", title)[:60].strip("_") or "task_family"
         rec = get_entity("ProjectRecord")(
-            id=sha_id("project", f"generated:{dom}:{name}"),
+            id=sha_id("project", f"generated:{dom}:{asset}:{name}"),
             name=name,
             title=title,
             owner=owner,
             origin="generated",
             task_type=f"任务族（{dom}）",
+            asset_classes=[asset] if asset != "none" else [],
             domains=[dom],
             related_tasks=[t["id"] for t in cl],
             source_sections=member_secs,
