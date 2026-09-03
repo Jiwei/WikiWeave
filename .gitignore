@@ -3,4 +3,5 @@
 artifact
 model_data/
 config/llm.json
-
+.playwright-mcp/
+presale*
