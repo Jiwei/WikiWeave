@@ -2,6 +2,8 @@
 *.ruff_cache
 artifact
 model_data/
+model_data_archive/
 config/llm.json
 .playwright-mcp/
 presale*
+push-to-github-io.sh
