@@ -1,4 +1,4 @@
-# Auto-Archivist
+# WikiWeave
 
 > A config-driven, provenance-anchored pipeline that turns an arbitrary corpus of source materials — **code, docs, chat logs, reports, specs, anything** — into a **linked, self-contained knowledge base**: an OKF-compliant Markdown wiki + structured JSON + navigable HTML with meta ontology schema and mining functions, bridging code intelligence and document intelligence.
 
@@ -6,7 +6,7 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 
 **The self-building knowledge graph for your code and docs.** Rather than hand-curating a
-knowledge base or throwing everything into a vector store, Auto-Archivist **discovers the
+knowledge base or throwing everything into a vector store, WikiWeave **discovers the
 structure itself** — from a config-driven ontology template and a fixed set of *meta-functions* —
 and mines an arbitrary corpus into a queryable, cross-linked, auditable graph.
 
@@ -16,7 +16,7 @@ and mines an arbitrary corpus into a queryable, cross-linked, auditable graph.
 
 Teams often accumulate knowledge in messy, unstructured form: chat threads, one-off READMEs, weekly
 reports, scripts whose "why" lives only in someone's head. **Vector stores store embeddings, not
-meaning** — context you can't explain and links you can't trace. Auto-Archivist turns that corpus
+meaning** — context you can't explain and links you can't trace. WikiWeave turns that corpus
 into a *queryable, cross-linked* knowledge graph where:
 
 - **Every entity** (a task, an error-and-fix, a workflow, a
@@ -32,9 +32,9 @@ means editing JSON, not Python.
 
 ---
 
-## Why Auto-Archivist
+## Why WikiWeave
 
-|                           | Plain RAG / vector store | Hand-curated wiki         | **Auto-Archivist**                 |
+|                           | Plain RAG / vector store | Hand-curated wiki         | **WikiWeave**                      |
 | ------------------------- | ------------------------ | ------------------------- | ---------------------------------- |
 | **How links form**        | embedding similarity     | manual, best-effort       | deterministic + LLM, traced        |
 | **Provenance**            | none                     | anecdotal                 | every entity → source section      |
@@ -55,7 +55,7 @@ means editing JSON, not Python.
 
 ---
 
-## What Auto-Archivist gives you
+## What WikiWeave gives you
 
 - **Config-driven ontology** — the entity schema is declared in JSON and turned into dataclasses at
   import time; adding an entity type is a JSON edit, never a code change.

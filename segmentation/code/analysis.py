@@ -87,8 +87,8 @@ def analyze_python(
     dep_edges: list[dict] = []
 
     # 模块点路径 → source_id(用于把 PyCG 节点/依赖解析回文件)
-    # 同时登记「带顶层包名前缀」的变体:输入根名(如 auto_archivist)+ 相对模块,
-    # 这样 import "auto_archivist.util.paths" 与相对键 "util.paths" 都能解析。
+    # 同时登记「带顶层包名前缀」的变体:输入根名(如 wikiweave)+ 相对模块,
+    # 这样 import "wikiweave.util.paths" 与相对键 "util.paths" 都能解析。
     root_pkg = Path(root).name
     mod_to_src: dict[str, str] = {}
     for s in py_sources:
